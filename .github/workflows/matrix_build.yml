@@ -1,0 +1,42 @@
+name: Multi-Platform Matrix Build (6c37a98)
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    # ✅ Matrix Strategy: 3 parallel variants
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [18]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ✅ Step with required identifier
+      - name: matrix-6c37a98
+        run: echo "Running matrix job on ${{ matrix.os }} with Node ${{ matrix.node-version }}"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # ✅ Generate build artifact (unique content per matrix)
+      - name: Generate build artifact
+        run: |
+          echo "Build output for OS: ${{ matrix.os }}, Node: ${{ matrix.node-version }}" > output.txt
+          echo "Generated on $(date)" >> output.txt
+          echo "Matrix variant: ${{ matrix.os }}-${{ matrix.node-version }}" >> output.txt
+          cat output.txt
+
+      # ✅ Upload unique artifact with required prefix
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-6c37a98-${{ matrix.os }}-${{ matrix.node-version }}
+          path: output.txt
